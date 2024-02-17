@@ -68,6 +68,8 @@ def main():
 
     st.set_page_config(page_title="AbdulPDFs", page_icon=":robot_face:", layout="centered",initial_sidebar_state="expanded")
     st.write(css, unsafe_allow_html=True)
+    st.image('https://scontent.fbkk28-1.fna.fbcdn.net/v/t39.30808-6/428659454_855853106340499_1221528150201157783_n.jpg?stp=cp6_dst-jpg&_nc_cat=102&ccb=1-7&_nc_sid=3635dc&_nc_eui2=AeHOBrj6IdwCXR_hHHJdkd0i1Xyiu7yNJqLVfKK7vI0momIiEgXyZPPCXU0cQ8r8Bhrj8gY9oXsg4oUM-Vn6j8V0&_nc_ohc=UQgLhzE5Gu4AX91DBfR&_nc_ht=scontent.fbkk28-1.fna&oh=00_AfB2qBupfHTqluF1yAC8jpNDcIIVtcy-WZMT2_pFBERvjw&oe=65D4BBD1', width=100)
+    # st.image('pics/abdul.png', width=100)
 
     if "my_text" not in st.session_state:
         st.session_state.my_text = ""
@@ -80,7 +82,7 @@ def main():
     if "vector_store" not in st.session_state:
         st.session_state.vector_store = None
     
-    st.header("AbdulPDFs :robot_face:")
+    st.header("AbdulPDFs")
         # Check if the button was clicked
     if st.button('Reset Chat History'):
         st.session_state.chat_history = []
@@ -94,8 +96,6 @@ def main():
         handle_userinput(my_text)
         st.session_state.my_text = ""
 
-
-
     
     with st.sidebar:
         st.subheader("Your PDFs")
@@ -108,7 +108,12 @@ def main():
                 # st.write(raw_text)
                 # get the text chunks
                 text_chunks = get_text_chunks(raw_text)
-                # st.write(text_chunks)
+                st.write("text chunks :", len(text_chunks))
+                # if chunk length more than 20, then it is too long
+                if len(text_chunks) > 10:
+                    st.error("The Demo Verion is limited the length of PDF.\
+                             The PDF is too long. Please upload a shorter PDF.")
+                    st.stop()
                 # creat embeddings
                 # create vector store
                 vector_store = get_vectorstore(text_chunks)
