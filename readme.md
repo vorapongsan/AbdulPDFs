@@ -9,6 +9,8 @@ source venv/bin/activate
 
 * Need to install lib
 pip install streamlit pypdf2 langchain python-dotenv faiss-cpu openai
+pip install tiktoken
+pip install InstructorEmbedding sentence_transformers
 
 * create the config files
 touch .gitignore
@@ -22,3 +24,6 @@ touch .env
 git init 
 
 
+sentence-transformers==2.3.1
+
+https://www.youtube.com/watch?v=dXxQ0LR-3Hg
