@@ -44,8 +44,8 @@ def get_conversation_chain(vectorstore):
     return conversation_chain
 
 def handle_userinput(user_question):
-     if 'coverstation' in st.session_state and callable(st.session_state.coverstation):
-        response = st.session_state.coverstation({"question": user_question})
+     if 'conversation' in st.session_state and callable(st.session_state.conversation):
+        response = st.session_state.conversation({"question": user_question})
         # st.write(response)
         st.session_state.chat_history = response['chat_history']
         
@@ -72,8 +72,8 @@ def main():
     if "my_text" not in st.session_state:
         st.session_state.my_text = ""
 
-    if "coverstation" not in st.session_state:
-        st.session_state.coverstation = None
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = None
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
     
@@ -85,7 +85,7 @@ def main():
     if st.button('Reset Chat History'):
         st.session_state.chat_history = []
         if st.session_state.vector_store:
-            st.session_state.coverstation = get_conversation_chain(st.session_state.vector_store)
+            st.session_state.conversation = get_conversation_chain(st.session_state.vector_store)
 
     st.text_input("Enter question here", key="widget", on_change=submit)
     my_text = st.session_state.my_text
@@ -109,16 +109,16 @@ def main():
                 st.write("text chunks :", len(text_chunks))
                 # if chunk length more than 20, then it is too long
                 if len(text_chunks) > 10:
-                    st.error("The Demo Verion is limited the length of PDF.\
+                    st.error("The demo version is limited the length of PDF.\
                              The PDF is too long. Please upload a shorter PDF.")
                     st.stop()
-                # creat embeddings
+                # create embeddings
                 # create vector store
                 vector_store = get_vectorstore(text_chunks)
                 st.session_state.vector_store = vector_store
 
                 # create conversation chain
-                st.session_state.coverstation = get_conversation_chain(vector_store)
+                st.session_state.conversation = get_conversation_chain(vector_store)
 
   #      st.write("AbdulPDF is a chatbot that can help you find information in your PDFs.")
         st.write("Upload your PDFs and ask questions about the content.")
