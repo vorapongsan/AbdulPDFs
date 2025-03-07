@@ -9,6 +9,10 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_models import ChatOpenAI  
 from htmlTemplates import css, bot_template, user_template
 
+#================================================================================================
+# Functions
+#================================================================================================
+# get pdf text is to extract text from pdf files
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -18,6 +22,7 @@ def get_pdf_text(pdf_docs):
             text += page.extract_text()
     return text
 
+# get_text_chunks is to split the text into chunks
 def get_text_chunks(text):
     text_splitter = CharacterTextSplitter(
         separator=" ",
@@ -28,12 +33,16 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+# get_vectorstore is to create embeddings using OpenAIEmbeddings
+# and create vectorstore using FAISS
 def get_vectorstore(text_chunks):
     embeddings = OpenAIEmbeddings()
     # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts= text_chunks, embedding = embeddings)
     return vectorstore
 
+# get_conversation_chain is to create a conversation chain
+# using ChatOpenAI and ConversationBufferMemory
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()
     memory = ConversationBufferMemory(memory_key= 'chat_history', return_messages= True)
@@ -43,6 +52,8 @@ def get_conversation_chain(vectorstore):
         memory= memory)
     return conversation_chain
 
+# handle_userinput is to handle the user input
+# and get the response from the conversation chain
 def handle_userinput(user_question):
      if 'conversation' in st.session_state and callable(st.session_state.conversation):
         response = st.session_state.conversation({"question": user_question})
@@ -55,12 +66,16 @@ def handle_userinput(user_question):
             else:
                 st.write(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
 
+# submit is to submit the user input
 def submit():
     st.session_state.my_text = st.session_state.widget
     st.session_state.widget = ""
 
 
 
+#================================================================================================
+# Main
+#================================================================================================
 def main():
     load_dotenv()
 
@@ -103,7 +118,7 @@ def main():
             with st.spinner("Processing..."):
                 # get pdf text
                 raw_text = get_pdf_text(pdf_docs)
-                # st.write(raw_text)
+                st.write(raw_text)
                 # get the text chunks
                 text_chunks = get_text_chunks(raw_text)
                 st.write("text chunks :", len(text_chunks))
@@ -111,7 +126,7 @@ def main():
                 if len(text_chunks) > 10:
                     st.error("The demo version is limited the length of PDF.\
                              The PDF is too long. Please upload a shorter PDF.")
-                    st.stop()
+                    st.stop()         
                 # create embeddings
                 # create vector store
                 vector_store = get_vectorstore(text_chunks)
@@ -122,9 +137,7 @@ def main():
 
   #      st.write("AbdulPDF is a chatbot that can help you find information in your PDFs.")
         st.write("Upload your PDFs and ask questions about the content.")
-        st.write("Developed by CBTU, ver 1.0")
-
-        
+        st.write("Developed by CBTU, ver 1.0")        
 
 if __name__ == "__main__":
     main()
