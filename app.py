@@ -6,7 +6,9 @@ from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores  import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.chat_models import ChatOpenAI  
+from langchain_community.chat_models import ChatOpenAI
+from langchain_groq import ChatGroq
+from langchain_together import TogetherEmbeddings
 from htmlTemplates import css, bot_template, user_template
 
 #================================================================================================
@@ -36,7 +38,10 @@ def get_text_chunks(text):
 # get_vectorstore is to create embeddings using OpenAIEmbeddings
 # and create vectorstore using FAISS
 def get_vectorstore(text_chunks):
-    embeddings = OpenAIEmbeddings()
+    # embeddings = OpenAIEmbeddings()
+    embeddings = TogetherEmbeddings(
+        model="togethercomputer/m2-bert-80M-8k-retrieval",
+    )
     # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts= text_chunks, embedding = embeddings)
     return vectorstore
@@ -44,7 +49,12 @@ def get_vectorstore(text_chunks):
 # get_conversation_chain is to create a conversation chain
 # using ChatOpenAI and ConversationBufferMemory
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
+    # llm = ChatOpenAI()
+    # Initialize the ChatGroq object
+    llm = ChatGroq(
+        model="llama-3.2-3b-preview",
+        temperature=0,
+    )
     memory = ConversationBufferMemory(memory_key= 'chat_history', return_messages= True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm = llm,
